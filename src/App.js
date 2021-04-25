@@ -28,7 +28,7 @@ const App = () => {
 
     React.useEffect(() => {
       localStorage.setItem(key, value);
-    }, [value]);
+    }, [value, key]);
     
     return [value, setValue]
   }
