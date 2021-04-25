@@ -20,9 +20,20 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = React.useState(
-    localStorage.getItem('search') || 'React'
-  );
+
+  const useSemiPersistentState = () => {
+    const [searchTerm, setSearchTerm] = React.useState(
+      localStorage.getItem('search') || 'React'
+    );
+
+    React.useEffect(() => {
+      localStorage.setItem('search', searchTerm);
+    }, [searchTerm]);
+    
+    return [searchTerm, setSearchTerm]
+  }
+
+  const [searchTerm, setSearchTerm] = useSemiPersistentState();
 
   const handleSearch = event => {
     console.log(event.target.value) ||
@@ -30,15 +41,12 @@ const App = () => {
      //localStorage.setItem('search', event.target.value);
   };
 
-  React.useEffect(() => {
-    localStorage.setItem('search', searchTerm);
-  }, [searchTerm]);
-
   const searchedStories = stories.filter(function(story) {
     return story.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
   });
+
 
   return (
     <div>
