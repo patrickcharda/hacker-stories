@@ -1,5 +1,17 @@
 import * as React from 'react';
 
+const useSemiPersistentState = (key, initialState) => {
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [value, key]);
+  
+  return [value, setValue]
+}
+
 const App = () => {
   const stories = [
     {
@@ -19,19 +31,6 @@ const App = () => {
       objectID: 1,
     },
   ];
-
-
-  const useSemiPersistentState = (key, initialState) => {
-    const [value, setValue] = React.useState(
-      localStorage.getItem(key) || initialState
-    );
-
-    React.useEffect(() => {
-      localStorage.setItem(key, value);
-    }, [value, key]);
-    
-    return [value, setValue]
-  }
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState(
     'search',
@@ -60,13 +59,15 @@ const App = () => {
         label="Search"
         value={searchTerm}
         onInputChange={handleSearch}
-      > <strong>Search :</strong> 
+      > 
+      <strong>Search :</strong> 
+
       </InputWithLabel>
  
-     
       <hr />
 
-      <List list={searchedStories} />
+      <List list={searchedStories}/>
+
     </div>
   );
 };
@@ -76,19 +77,31 @@ const InputWithLabel = ({
   value,
   type = 'text',
   onInputChange,
+  isFocused,
   children,
-}) => (
-  <>
-    <label htmlFor={id}>{children}</label>
-    &nbsp;
-    <input
-      id={id}
-      type={type}
-      value={value}
-      onChange={onInputChange}
-    />
-  </>
-);
+  }) => {
+    const inputRef = React.useRef();
+
+    React.useEffect(() => {
+      if (isFocused) {
+        inputRef.current.focus();
+      }
+    }, [isFocused])
+
+    return (
+    <>
+      <label htmlFor={id} >{children}</label>
+      &nbsp;
+      <input
+        ref={inputRef}
+        id={id}
+        type={type}
+        value={value}
+        onChange={onInputChange}
+      />
+    </>
+    )
+  }
 
 /*const Search = ({onSearch, search}) => {
   /*const handleChange = event => {
